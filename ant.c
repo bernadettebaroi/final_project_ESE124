@@ -1,44 +1,35 @@
 #include <stdio.h>
-#include "queue.h"
+#include "stack.h"
 #include <stdlib.h> 
 
-int maze_row;
-int maze_col;
-int row = 0;
-int col = 0;
-char maze[32][32];
-
-
-void assign(int x, int y) {
-    maze_row = x;
-    maze_col = y;
-}
+// max_row
 
 //1. MARK – the ant marks its current position using a chemical called pheromone.
-void mark(int x, int y, char c) {
-    maze[x][y] = c;
+void mark(int *x, int *y, char **maze) {
+    _push(*x,*y);
+    maze[*x][*y] = '@';
 }
 
 // 2. MOVE_F – moves the VA from the current position one position forward. If Michael 
 // locates at coordinates (x, y), it will move to (x + 1, y).
-void move_f(int x, int y) {
-    if (maze[row+1][col] != '*' || row+1 < maze_row) {
-        mark(x+1, y, '@');
-        _push(x+1,y);
-    }
+void move_f(int *x, int *y, char **maze) {
+    *x = (*x)+1;
+    mark(x, y, maze);
+    _push(*x,*y);
 }
 
 //6.CWL – Michael checks if the next locations to the left (until meeting a wall) are pheromone
 // free. If the locations are free then Michael feels an itch. Otherwise, if no location is free
 // (e.g., because there is a pheromone mark or a wall on the left of Michael), then Michael
 // does not feel the itch.
-int cwl(int x, int y) {
-    int position = 0;
-    if (y == 0) {
+int* cwl(int *x, int *y, char **maze) {
+    int *position;
+    *position = 0;
+    if (*y == 0) {
         return 0;
     }
-    for (int i = y; i >= 0; i--) {
-        if (maze[x][i] == '@' || maze[x][i] == '*') {
+    for (int i = *y; i >= 0; i--) {
+        if (maze[*x][i] == '@' || maze[*x][i] == '*') {
             return 0;
         }
         position++;
@@ -58,10 +49,14 @@ int cwl(int x, int y) {
 // still executes action BJPI, then Michael stays in its current position. Every BJPI stops the
 // corresponding itching of the ant, e.g., the itching type that triggered the jump.
 
-void bjpi(int x, int y) {
-    int k = 0;
-    if ((k = cwl(x, y)) > 0) {
-        mark(x, y-k, '@');
+void bjpi(int *x, int *y, char **maze) {
+    //left
+    int *k;
+    k = cwl(x, y, maze);
+    if (*k > 0) {
+        y = *y - *k;
+        mark(x, y, maze);
+        _push(*x,*y);
     }
 }
 
