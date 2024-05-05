@@ -11,7 +11,7 @@ typedef struct {
 
 void _push(Stack *stack, int x, int y);
 void _pop(Stack *stack);
-void _peek(Stack *stack);
+void peek(Stack *stack, int *x, int *y);
 int is_empty(Stack *stack);
 int is_full(Stack *stack);
 void _clear(Stack *stack);
