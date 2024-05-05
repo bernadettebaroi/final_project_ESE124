@@ -14,6 +14,21 @@ void mark(int *x, int *y, char **maze) {
 void move_f(int *x, int *y, char **maze) {
     *x = (*x)+1;
 }
+// 3. MOVE_B – moves the virtual ant from the current position one position backward. 
+// If Michael locates at coordinates (x, y), it will move to (x - 1, y).
+void move_b(int *x, int *y, char **maze) {
+    *x = (*x) - 1;
+}
+// 4. MOVE_L – moves the virtual ant from the current position one position left.
+// If Michael locates at coordinates (x, y), it will move to (x, y - 1).
+void move_l(int *x, int *y, char **maze) {
+    *y = (*y) - 1;
+}
+// 5. MOVE_R – moves the virtual ant from the current position one position right.
+// If Michael locates at coordinates (x, y), it will move to (x, y + 1).
+void move_r(int *x, int *y, char **maze) {
+    *y = (*y) + 1;
+}
 
 //6.CWL – Michael checks if the next locations to the left (until meeting a wall) are pheromone
 // free. If the locations are free then Michael feels an itch. Otherwise, if no location is free
