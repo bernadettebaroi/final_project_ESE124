@@ -1,5 +1,6 @@
 #include <stdlib.h> 
 #include <stdio.h>
+#include <string.h>
 #include "stack.h"
 #include "ant.h"
 
@@ -7,6 +8,7 @@
 #define MAX_ACTIONS 1000
 
 char maze[32][32];
+char **maze_ptr = maze;
 int MAX_ROW;
 int MAX_COL;
 
@@ -29,6 +31,7 @@ int main() {
     }
     int row = 0;
     int col = 0;
+
     char d = fgetc(fp);
     while (d != EOF) {
         if (d == '\n') {
@@ -56,7 +59,7 @@ int main() {
     fscanf(fp2, "%d\n", &col);
 
     // Initialize ant's memory
-    Stack *memory;
+    Stack memory;
     //memory.top = -1;
 
     // Perform actions
@@ -67,39 +70,49 @@ int main() {
     char direction[32];
     int points = 0;
 
+    printf("maze pointer: %p\n", maze);
 
-    while (fscanf(fp2, "%s\n", &n) != EOF && steps < MAX_NUMBER_OF_STEPS) {
-        if (maze[row][col] >= '0' && maze[row][col] <= '9') {
-            points += atoi(maze[row][col]);
+    for(int i = 0; i < 11; i++)
+    {
+        for(int j = 0; j < 11; j++)
+        {
+            printf("%c", maze[i][j]);
         }
+        printf("\n");
+    }
 
+
+    while (fscanf(fp2, "%s\n", n) != EOF && steps < MAX_NUMBER_OF_STEPS) {
+        printf("loop\n");
+        //writing action to file
+        fputs(n, fp3);
+        if (maze[row][col] >= '0' && maze[row][col] <= '9') {
+            points += atoi(&maze[row][col]);
+            mark(&row, &col, maze);
+        }
         if(strcmp(n,"MARK")==0){
             mark(&row, &col, maze);
+            printf("Marked\n");
 		}
-
         if(strcmp(n,"MOVEF")==0){
             if (maze[row+1][col] != '@' || maze[row+1][col] != '*' || row+1 >= MAX_ROW) {
                 move_f(&row, &col, maze);
             }
-            steps++;
 		}
         if(strcmp(n,"MOVEB")==0){
             if (maze[row-1][col] != '@' || maze[row-1][col] != '*' || row-1 < 0) {
                 move_b(&row, &col, maze);
             }
-            steps++;
 		}
         if(strcmp(n,"MOVEL")==0){
             if (maze[row][col-1] != '@' || maze[row][col-1] != '*' || col-1 < 0) {
                 move_l(&row, &col, maze);
             }
-            steps++;
 		}
         if(strcmp(n,"MOVER")==0){
             if (maze[row][col+1] != '@' || maze[row][col+1] != '*' || col+1 >= MAX_COL) {
                 move_r(&row, &col, maze);
             }
-            steps++;
 		}
         if(strcmp(n,"CWL")==0){
 			itch = cwl(&row, &col, maze);
@@ -119,15 +132,15 @@ int main() {
 		}
 
         if(strcmp(n,"BJPI")==0){
-            bjpi(row, col, maze, &direction, itch);
+            bjpi(&row, &col, maze, direction, itch);
 		}
         if(strcmp(n,"CJPI")==0){
-            cjpi(row, col, maze, &direction, itch);
+            cjpi(&row, &col, maze, direction, itch);
 		}
         if(strcmp(n,"BACKTRACK")==0){
-            backtrack(row, col, memory);
+            backtrack(&row, &col, &memory);
 		}
-
+        steps++;
     }
     return 0;
 }

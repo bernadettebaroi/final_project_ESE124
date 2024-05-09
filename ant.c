@@ -2,11 +2,25 @@
 #include "stack.h"
 #include "ant.h"
 #include <stdlib.h> 
+#include <string.h>
 
 
 //1. MARK – the ant marks its current position using a chemical called pheromone.
 void mark(int *x, int *y, char **maze) {
+    printf("**maze ptr = %p\n", maze);
+    for(int i = 0; i < 11; i++)
+    {
+        for(int j = 0; j < 11; j++)
+        {
+            printf("%c", maze[i][j]);
+        }
+        printf("\n");
+    }
+    printf("0\n");
+    printf("row and col: %d %d\n", *x, *y);
+    printf("1\n");
     maze[*x][*y] = '@';
+    printf("2\n");
 }
 
 // 2. MOVE_F – moves the VA from the current position one position forward. If Michael 
@@ -121,22 +135,22 @@ int* cwb(int *x, int *y, char **maze) {
 // corresponding itching of the ant, e.g., the itching type that triggered the jump.
 
 void bjpi(int *x, int *y, char **maze, char*direction, int *itch) {
-    if (strcmp(*direction,"left")==0) {
+    if (strcmp(direction,"left")==0) {
         if (*itch > 0) {
             *y = (*y) - (*itch);
         }
     }
-    if (strcmp(*direction,"right")==0) {
+    if (strcmp(direction,"right")==0) {
         if (*itch > 0) {
             *y = (*y) + (*itch);
         }
     }
-    if (strcmp(*direction,"forward")==0) {
+    if (strcmp(direction,"forward")==0) {
         if (*itch > 0) {
             *x = (*x) + (*itch);
         }
     }
-    if (strcmp(*direction,"backward")==0) {
+    if (strcmp(direction,"backward")==0) {
         if (*itch > 0) {
             *x = (*x) - (*itch);
         }
@@ -151,22 +165,22 @@ void bjpi(int *x, int *y, char **maze, char*direction, int *itch) {
 // stops the corresponding itching of the ant.
 
 void cjpi(int *x, int *y, char **maze, char*direction, int *itch) {
-    if (strcmp(*direction,"left")==0) {
+    if (strcmp(direction,"left")==0) {
         if (*itch > 0) {
             (*y) -= 1;
         }
     }
-    if (strcmp(*direction,"right")==0) {
+    if (strcmp(direction,"right")==0) {
         if (*itch > 0) {
            (*y) += 1;
         }
     }
-    if (strcmp(*direction,"forward")==0) {
+    if (strcmp(direction,"forward")==0) {
         if (*itch > 0) {
             (*x) += 1;
         }
     }
-    if (strcmp(*direction,"backward")==0) {
+    if (strcmp(direction,"backward")==0) {
         if (*itch > 0) {
             (*x) -= 1;
         }
@@ -180,12 +194,12 @@ void cjpi(int *x, int *y, char **maze, char*direction, int *itch) {
 // Backtrack will move Michael back to this position.
 
 void backtrack(int *x, int *y, Stack *memory) {
-    if (is_empty(&memory)) {
+    if (is_empty(memory)) {
         printf("Memory stack is empty, cannot backtrack\n");
         return;
     }
     peek(memory, x ,y);
-    pop(memory);
+    _pop(memory);
 }
 
 //17. RP n t – repeats the n actions following the RP action for t times.

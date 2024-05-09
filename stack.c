@@ -1,4 +1,5 @@
 #include "stack.h"
+#include <stdio.h>
 #define MAX_SIZE 100
 
 int top = -1;
@@ -18,7 +19,7 @@ void push(Stack *stack, int x, int y) {
 
 // 11. POP - pops the planar coordinates x and y from the top of the Michael’s stack for the memory. 
 // This way Michael remembers the position, but then it immediately forgets the position too.
-void pop(Stack *stack) {
+void _pop(Stack *stack) {
     if (is_empty(stack)) {
         printf("Stack underflow\n");
         return;
