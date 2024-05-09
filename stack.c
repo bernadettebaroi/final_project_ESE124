@@ -1,7 +1,7 @@
 #include "stack.h"
 #define MAX_SIZE 100
 
-top = -1;
+int top = -1;
 
 // 10. PUSH – pushes the planar coordinates x and y of Michael’s current position into Michael’s stack 
 // for the memory. This way Michael memorizes the current position.
