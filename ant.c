@@ -7,20 +7,7 @@
 
 //1. MARK – the ant marks its current position using a chemical called pheromone.
 void mark(int *x, int *y, char **maze) {
-    printf("**maze ptr = %p\n", maze);
-    for(int i = 0; i < 11; i++)
-    {
-        for(int j = 0; j < 11; j++)
-        {
-            printf("%c", maze[i][j]);
-        }
-        printf("\n");
-    }
-    printf("0\n");
-    printf("row and col: %d %d\n", *x, *y);
-    printf("1\n");
     maze[*x][*y] = '@';
-    printf("2\n");
 }
 
 // 2. MOVE_F – moves the VA from the current position one position forward. If Michael 
@@ -69,16 +56,16 @@ int* cwl(int *x, int *y, char **maze) {
 // Otherwise, if no location is free (e.g., because there is a wall or a pheromone mark on the
 // right of Michael), then Michael does not feel the itch.
 int* cwr(int *x, int *y, char **maze) {
-    int *position;
-    *position = 0;
-    if (*y == 0) {//here do I need to create a new variable to represent the rightmost edge?
+    int value = 0;
+    int *position = &value;
+    if (*y == 0) {
         return 0;
     }
-    for (int i = *y + 1; i >= 0; i++) {
+    for (int i = *y + 1; i < sizeof(maze[0]); i++) {
         if (maze[*x][i] == '@' || maze[*x][i] == '*') {
             return position;
         }
-        position++; //doesn't this have to to be a pointer? 
+        (*position)++; //doesn't this have to to be a pointer? 
     }
     return position;
 }
@@ -89,12 +76,12 @@ int* cwr(int *x, int *y, char **maze) {
 // then Michael does not feel the itch
 
 int* cwf(int *x, int *y, char **maze) {
-    int *position;
-    *position = 0;
+    int value = 0;
+    int *position = &value;
     if (*x == 0) {
         return 0;
     }
-    for (int i = *x + 1; i >= 0; i++) { //doesn't the inequality go the oppostie way?
+    for (int i = *x + 1; i < sizeof(maze); i++) { //doesn't the inequality go the oppostie way?
         if (maze[*y][i] == '@' || maze[*y][i] == '*') {
             return position;
         }
@@ -108,8 +95,8 @@ int* cwf(int *x, int *y, char **maze) {
 // Otherwise, if no location is free (e.g., because there is a wall or a pheromone mark behind
 // of Michael), then Michael does not feel the itch
 int* cwb(int *x, int *y, char **maze) {
-    int *position;
-    *position = 0;
+    int value = 0;
+    int *position = &value;
     if (*x == 0) { 
         return 0;
     }
@@ -134,25 +121,25 @@ int* cwb(int *x, int *y, char **maze) {
 // still executes action BJPI, then Michael stays in its current position. Every BJPI stops the
 // corresponding itching of the ant, e.g., the itching type that triggered the jump.
 
-void bjpi(int *x, int *y, char **maze, char*direction, int *itch) {
+void bjpi(int *x, int *y, char **maze, char*direction, int itch) {
     if (strcmp(direction,"left")==0) {
-        if (*itch > 0) {
-            *y = (*y) - (*itch);
+        if (itch > 0) {
+            *y = (*y) - (itch);
         }
     }
     if (strcmp(direction,"right")==0) {
-        if (*itch > 0) {
-            *y = (*y) + (*itch);
+        if (itch > 0) {
+            *y = (*y) + (itch);
         }
     }
     if (strcmp(direction,"forward")==0) {
-        if (*itch > 0) {
-            *x = (*x) + (*itch);
+        if (itch > 0) {
+            *x = (*x) + (itch);
         }
     }
     if (strcmp(direction,"backward")==0) {
-        if (*itch > 0) {
-            *x = (*x) - (*itch);
+        if (itch > 0) {
+            *x = (*x) - (itch);
         }
     }
 }
@@ -164,29 +151,28 @@ void bjpi(int *x, int *y, char **maze, char*direction, int *itch) {
 // was felt after Michael checked the locations to the right of its current position. Every CJPI
 // stops the corresponding itching of the ant.
 
-void cjpi(int *x, int *y, char **maze, char*direction, int *itch) {
+void cjpi(int *x, int *y, char **maze, char*direction, int itch) {
     if (strcmp(direction,"left")==0) {
-        if (*itch > 0) {
+        if (itch > 0) {
             (*y) -= 1;
         }
     }
     if (strcmp(direction,"right")==0) {
-        if (*itch > 0) {
+        if (itch > 0) {
            (*y) += 1;
         }
     }
     if (strcmp(direction,"forward")==0) {
-        if (*itch > 0) {
+        if (itch > 0) {
             (*x) += 1;
         }
     }
     if (strcmp(direction,"backward")==0) {
-        if (*itch > 0) {
+        if (itch > 0) {
             (*x) -= 1;
         }
     }
-
-    *itch = 0;
+    itch = 0;
 }
 
 // 16. BACKTRACK – Michael backtracks to the position that is retrieved from the memory, such
@@ -203,7 +189,70 @@ void backtrack(int *x, int *y, Stack *memory) {
 }
 
 //17. RP n t – repeats the n actions following the RP action for t times.
+void rp(char* rp, char*n, int *t, int *x, int *y, char **maze, char*direction, int itch, Stack *memory) {
+    for (int i = 0; i < *t;i++) {
+        char *action = n;
+        while (*action != '\0') {
+            if (strcmp(action, "MARK") == 0) {
+                mark(x, y, maze);
+            } else if (strcmp(action, "MOVEF") == 0) {
+                move_f(x, y, maze);
+            } else if (strcmp(action, "MOVEB") == 0) {
+                move_b(x, y, maze);
+            } else if (strcmp(action, "MOVEL") == 0) {
+                move_l(x, y, maze);
+            } else if (strcmp(action, "MOVER") == 0) {
+                move_r(x, y, maze);
+            } else if (strcmp(action, "CWL") == 0) {
+                cwl(x, y, maze);
+            } else if (strcmp(action, "CWR") == 0) {
+                cwr(x, y, maze);
+            } else if (strcmp(action, "CWF") == 0) {
+                cwf(x, y, maze);
+            } else if (strcmp(action, "CWB") == 0) {
+                cwb(x, y, maze);
+            } else if (strcmp(action, "BJPI") == 0) {
+                bjpi(x, y, maze, direction, itch);
+            } else if (strcmp(action, "CJPI") == 0) {
+                cjpi(x, y, maze, direction, itch);
+            } else if (strcmp(action, "BACKTRACK") == 0) {
+                backtrack(x, y, memory);
+            } else {
+                printf("Invalid action: %s\n", action);
+            }
+            action += strlen(action) + 1; // Move to the next action in the string
+        }
 
-// void rp(char* rp, char*n ) {
-
-// }
+        action = rp;
+        while (*action != '\0') {
+            if (strcmp(action, "MARK") == 0) {
+                mark(x, y, maze);
+            } else if (strcmp(action, "MOVEF") == 0) {
+                move_f(x, y, maze);
+            } else if (strcmp(action, "MOVEB") == 0) {
+                move_b(x, y, maze);
+            } else if (strcmp(action, "MOVEL") == 0) {
+                move_l(x, y, maze);
+            } else if (strcmp(action, "MOVER") == 0) {
+                move_r(x, y, maze);
+            } else if (strcmp(action, "CWL") == 0) {
+                cwl(x, y, maze);
+            } else if (strcmp(action, "CWR") == 0) {
+                cwr(x, y, maze);
+            } else if (strcmp(action, "CWF") == 0) {
+                cwf(x, y, maze);
+            } else if (strcmp(action, "CWB") == 0) {
+                cwb(x, y, maze);
+            } else if (strcmp(action, "BJPI") == 0) {
+                bjpi(x, y, maze, direction, itch);
+            } else if (strcmp(action, "CJPI") == 0) {
+                cjpi(x, y, maze, direction, itch);
+            } else if (strcmp(action, "BACKTRACK") == 0) {
+                backtrack(x, y, memory);
+            } else {
+                printf("Invalid action: %s\n", action);
+            }
+            action += strlen(action) + 1; // Move to the next action in the string
+        }
+    }
+}

@@ -12,8 +12,9 @@ int* cwl(int *x, int *y, char **maze);
 int* cwr(int *x, int *y, char **maze);
 int* cwf(int *x, int *y, char **maze);
 int* cwb(int *x, int *y, char **maze);
-void bjpi(int *x, int *y, char **maze, char*direction, int *itch);
-void cjpi(int *x, int *y, char **maze, char*direction, int *itch);
+void bjpi(int *x, int *y, char **maze, char*direction, int itch);
+void cjpi(int *x, int *y, char **maze, char*direction, int itch);
 void backtrack(int *x, int *y, Stack *memory);
+void rp(char* rp, char*n, int *t, int *x, int *y, char **maze, char*direction, int itch, Stack *memory);
 
 #endif

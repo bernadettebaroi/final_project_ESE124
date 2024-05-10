@@ -7,12 +7,37 @@
 #define MAX_NUMBER_OF_STEPS 1000
 #define MAX_ACTIONS 1000
 
-char maze[32][32];
-char **maze_ptr = maze;
-int MAX_ROW;
-int MAX_COL;
+
+char **convert_to_pointer_array(char maze[32][32]) {
+    // Allocate memory for array of pointers
+    char **pointer_array = malloc(32 * sizeof(char *));
+    if (pointer_array == NULL) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+
+    // Allocate memory for each row and copy data
+    for (int i = 0; i < 32; i++) {
+        pointer_array[i] = malloc(32 * sizeof(char));
+        if (pointer_array[i] == NULL) {
+            printf("Memory allocation failed\n");
+            exit(1);
+        }
+        // Copy data from maze to pointer_array
+        for (int j = 0; j < 32; j++) {
+            pointer_array[i][j] = maze[i][j];
+        }
+    }
+
+    return pointer_array;
+}
+
 
 int main() {
+    char maze[32][32];
+    
+    int MAX_ROW;
+    int MAX_COL;
 
     // Write sequence of actions performed by Michael into output file
     FILE *fp3;
@@ -60,7 +85,7 @@ int main() {
 
     // Initialize ant's memory
     Stack memory;
-    //memory.top = -1;
+    char **maze_pointer = convert_to_pointer_array(maze);
 
     // Perform actions
     int steps = 0;
@@ -70,77 +95,84 @@ int main() {
     char direction[32];
     int points = 0;
 
-    printf("maze pointer: %p\n", maze);
 
-    for(int i = 0; i < 11; i++)
-    {
-        for(int j = 0; j < 11; j++)
-        {
-            printf("%c", maze[i][j]);
-        }
-        printf("\n");
-    }
-
-
+  
     while (fscanf(fp2, "%s\n", n) != EOF && steps < MAX_NUMBER_OF_STEPS) {
-        printf("loop\n");
         //writing action to file
+        //printf("%s row: %d col: %d\n", n, row, col);
         fputs(n, fp3);
+        fputs("\n", fp3);
+
         if (maze[row][col] >= '0' && maze[row][col] <= '9') {
-            points += atoi(&maze[row][col]);
-            mark(&row, &col, maze);
+            points += atoi(&maze_pointer[row][col]);
+            mark(&row, &col, maze_pointer);
         }
         if(strcmp(n,"MARK")==0){
-            mark(&row, &col, maze);
-            printf("Marked\n");
+            mark(&row, &col, maze_pointer);
+            for(int i = 0; i < 11; i++) {
+                for(int j = 0; j < 11; j++){
+                    printf("%c", maze_pointer[i][j]);
+                }
+                printf("\n");
+            }
+            printf("\n\n");
 		}
         if(strcmp(n,"MOVEF")==0){
             if (maze[row+1][col] != '@' || maze[row+1][col] != '*' || row+1 >= MAX_ROW) {
-                move_f(&row, &col, maze);
+                move_f(&row, &col, maze_pointer);
             }
 		}
         if(strcmp(n,"MOVEB")==0){
             if (maze[row-1][col] != '@' || maze[row-1][col] != '*' || row-1 < 0) {
-                move_b(&row, &col, maze);
+                move_b(&row, &col, maze_pointer);
             }
 		}
         if(strcmp(n,"MOVEL")==0){
             if (maze[row][col-1] != '@' || maze[row][col-1] != '*' || col-1 < 0) {
-                move_l(&row, &col, maze);
+                move_l(&row, &col, maze_pointer);
             }
 		}
         if(strcmp(n,"MOVER")==0){
             if (maze[row][col+1] != '@' || maze[row][col+1] != '*' || col+1 >= MAX_COL) {
-                move_r(&row, &col, maze);
+                move_r(&row, &col, maze_pointer);
             }
 		}
         if(strcmp(n,"CWL")==0){
-			itch = cwl(&row, &col, maze);
+			itch = cwl(&row, &col, maze_pointer);
             strcpy(direction, "left");
 		}
         if(strcmp(n,"CWR")==0){
-			itch = cwr(&row, &col, maze);
+			itch = cwr(&row, &col, maze_pointer);
             strcpy(direction, "right");
 		}
         if(strcmp(n,"CWF")==0){
-			itch = cwf(&row, &col, maze);
+			itch = cwf(&row, &col, maze_pointer);
             strcpy(direction, "forward");
 		}
         if(strcmp(n,"CWB")==0){
-			itch = cwb(&row, &col, maze);
+			itch = cwb(&row, &col, maze_pointer);
             strcpy(direction, "backward");
 		}
-
         if(strcmp(n,"BJPI")==0){
-            bjpi(&row, &col, maze, direction, itch);
+            bjpi(&row, &col, maze_pointer, direction, *itch);
 		}
         if(strcmp(n,"CJPI")==0){
-            cjpi(&row, &col, maze, direction, itch);
+            cjpi(&row, &col, maze_pointer, direction, *itch);
 		}
         if(strcmp(n,"BACKTRACK")==0){
             backtrack(&row, &col, &memory);
 		}
+        if(strcmp(n,"Repeat")==0){
+            char *r;
+            char *n;
+            int *t;
+            scanf("%s %s %d", r, n, t);
+            rp(r, n, t, &row, &col, maze_pointer, direction, *itch,  &memory);
+		}
+
         steps++;
     }
+
+    printf("Accured points: %d\n", points);
     return 0;
 }
